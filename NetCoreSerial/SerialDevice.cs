@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -6,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace System.IO.Ports
 {
-    public class SerialDevice:IDisposable
+    public class SerialDevice : IDisposable, ISerialDevice
     {
         public const int READING_BUFFER_SIZE = 1024;
 
