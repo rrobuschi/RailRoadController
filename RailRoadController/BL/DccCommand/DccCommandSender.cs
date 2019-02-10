@@ -1,7 +1,7 @@
 ﻿using System.IO.Ports;
 using System.Text;
 
-namespace RailRoadController.BL.Command
+namespace RailRoadController.BL.DccCommand
 {
     public interface IDccCommandSender
     {

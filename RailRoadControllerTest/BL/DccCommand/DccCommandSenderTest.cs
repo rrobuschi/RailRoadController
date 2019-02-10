@@ -1,10 +1,10 @@
 ﻿using System.IO.Ports;
 using System.Text;
-using NUnit.Framework;
-using RailRoadController.BL.Command;
 using NSubstitute;
+using NUnit.Framework;
+using RailRoadController.BL.DccCommand;
 
-namespace RailRoadControllerTest.BL.Command
+namespace RailRoadControllerTest.BL.DccCommand
 {
     public class DccCommandSenderTest
     {
