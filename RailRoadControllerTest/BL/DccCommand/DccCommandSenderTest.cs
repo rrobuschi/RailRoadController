@@ -19,7 +19,7 @@ namespace RailRoadControllerTest.BL.DccCommand
         }
 
         [Test]
-        public void SendCommandShouldSendTheCommandToTheSerialPort()
+        public void SendCommand_should_send_the_command_to_the_serial_port()
         {
             var command = "command";
             _sut.SendCommand(command);

@@ -11,9 +11,9 @@ namespace RailRoadController.BL.Locomotive
 {
     public interface ILocomotivePersister
     {
-        void SaveFleet(List<Entities.Locomotive> locomotives);
+        void SaveFleet(List<Locomotive> locomotives);
 
-        List<Entities.Locomotive> LoadFleet();
+        List<Locomotive> LoadFleet();
     }
 
     public class LocomotivePersister : ILocomotivePersister
@@ -25,7 +25,7 @@ namespace RailRoadController.BL.Locomotive
             _locomotiveFilePath = locomotiveFilePath;
         }
 
-        public void SaveFleet(List<Entities.Locomotive> locomotives)
+        public void SaveFleet(List<Locomotive> locomotives)
         {
             var fleetConfiguration = ToConfig(locomotives);
 
@@ -34,7 +34,7 @@ namespace RailRoadController.BL.Locomotive
             File.WriteAllText(_locomotiveFilePath, fleetAsString);
         }
 
-        public List<Entities.Locomotive> LoadFleet()
+        public List<Locomotive> LoadFleet()
         {
             var fleetAsString = File.ReadAllText(_locomotiveFilePath);
 
@@ -45,7 +45,7 @@ namespace RailRoadController.BL.Locomotive
             return output;
         }
 
-        private List<LocomotiveConfiguration> ToConfig(IEnumerable<Entities.Locomotive> locomotives)
+        private List<LocomotiveConfiguration> ToConfig(IEnumerable<Locomotive> locomotives)
         {
             var output = new List<LocomotiveConfiguration>();
             foreach (var locomotive in locomotives)
@@ -59,12 +59,12 @@ namespace RailRoadController.BL.Locomotive
             return output;
         }
 
-        private List<Entities.Locomotive> FromConfig(IEnumerable<LocomotiveConfiguration> fleetConfiguration)
+        private List<Locomotive> FromConfig(IEnumerable<LocomotiveConfiguration> fleetConfiguration)
         {
-            var output = new List<Entities.Locomotive>();
+            var output = new List<Locomotive>();
             foreach (var locoConf in fleetConfiguration)
             {
-                output.Add(new Entities.Locomotive{Name = locoConf.Name, Address = locoConf.Address});
+                output.Add(new Locomotive{Name = locoConf.Name, Address = locoConf.Address});
             }
             return output;
         }

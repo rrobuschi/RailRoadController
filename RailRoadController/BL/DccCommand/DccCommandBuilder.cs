@@ -8,7 +8,7 @@ namespace RailRoadController.BL.DccCommand
 
         string BuildCommand(bool tracksOn);
 
-        string BuildCommand(string dccAddress, FunctionSet dccFunctions, bool locomotiveOn);
+        string BuildCommand(string dccAddress, FunctionSet dccFunctions);
     }
     
     public class DccCommandBuilder : IDccCommandBuilder
@@ -23,7 +23,7 @@ namespace RailRoadController.BL.DccCommand
             return tracksOn ? "<1>" : "<0>";
         }
 
-        public string BuildCommand(string dccAddress, FunctionSet dccFunctions, bool locomotiveOn)
+        public string BuildCommand(string dccAddress, FunctionSet dccFunctions)
         {
             var output = "";
 
@@ -36,7 +36,7 @@ namespace RailRoadController.BL.DccCommand
                 value += 4;
             if (dccFunctions.F4)
                 value += 8;
-            if (locomotiveOn)
+            if (dccFunctions.F0)
                 value += 16;
 
             output = AddCommand(output, "<f " + dccAddress + " " + value + ">");

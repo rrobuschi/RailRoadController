@@ -2,6 +2,7 @@
 {
     public class FunctionSet
     {
+        public bool F0 { get; set; }
         public bool F1 { get; set; }
         public bool F2 { get; set; }
         public bool F3 { get; set; }
