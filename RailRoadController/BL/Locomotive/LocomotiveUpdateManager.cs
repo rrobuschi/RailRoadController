@@ -6,7 +6,11 @@ using RailRoadController.BL.DccCommand;
 
 namespace RailRoadController.BL.Locomotive
 {
-    public class LocomotiveUpdateManager
+    public interface ILocomotiveUpdateManager
+    {
+    }
+
+    public class LocomotiveUpdateManager : ILocomotiveUpdateManager
     {
         private readonly ConcurrentQueue<string> _commandQueue;
         private readonly IDccCommandBuilder _dccCommandBuilder;

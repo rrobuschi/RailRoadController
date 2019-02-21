@@ -1,4 +1,5 @@
 ﻿using System;
+using RailRoadController.Controllers;
 using RailRoadController.Entities;
 
 namespace RailRoadController.BL.Locomotive
@@ -96,6 +97,31 @@ namespace RailRoadController.BL.Locomotive
                 Functions.F8 = !Functions.F8;
 
             RaiseFunctionChanged();
+        }
+
+        public LocomotiveStatus MapToLocomotiveStatus()
+        {
+            var output = new LocomotiveStatus
+            {
+                DccAddress = Address,
+                Name = Name,
+                Power = ProjectedPower,
+                Direction = Direction,
+                Functions = new FunctionSet
+                {
+                    F0 = Functions.F0,
+                    F1 = Functions.F1,
+                    F2 = Functions.F2,
+                    F3 = Functions.F3,
+                    F4 = Functions.F4,
+                    F5 = Functions.F5,
+                    F6 = Functions.F6,
+                    F7 = Functions.F7,
+                    F8 = Functions.F8
+                },
+                Inertia = Inertia
+            };
+            return output;
         }
     }
 }

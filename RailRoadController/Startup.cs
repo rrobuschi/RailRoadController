@@ -1,20 +1,57 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.IO.Ports;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RailRoadController.BL.DccCommand;
+using RailRoadController.BL.Locomotive;
+using RailRoadController.Entities;
 
 namespace RailRoadController
 {
     public class Startup
     {
+
+        public IConfiguration Configuration { get; }
+        private IHostingEnvironment CurrentEnvironment { get; set; }
+
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
+        {
+            Configuration = configuration;
+            CurrentEnvironment = env;
+        }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            // Add functionality to inject IOptions<T>
+            services.AddOptions();
+
+            // Add our Config object so it can be injected
+            services.Configure<MyAppSettings>(Configuration.GetSection("AppSettings"));
+
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            var locomotivePersister = new LocomotivePersister(Configuration.GetSection("AppSettings")["LocomotiveFile"]);
+            var fleet = locomotivePersister.LoadFleet();
+
+            services.AddSingleton<ILocomotiveManager>(x => new LocomotiveManager(fleet));
+            services.AddTransient<ILocomotive, Locomotive>();
+            services.AddTransient<ILocomotivePersister, LocomotivePersister>();
+            services.AddTransient<IDccCommandBuilder, DccCommandBuilder>();
+            if (CurrentEnvironment.IsDevelopment())
+                services.AddTransient<IDccCommandSender, DccCommandSenderMock>();
+            else
+                services.AddTransient<IDccCommandSender, DccCommandSender>();
+
+            services.AddSingleton<ISerialDevice>(x => new SerialDevice("/dev/ttyACM0", BaudRate.B115200));
+
+            var serviceProvider = services.BuildServiceProvider();
+
+            services.AddSingleton<ILocomotiveUpdateManager>(x => new LocomotiveUpdateManager(fleet,
+                serviceProvider.GetService<IDccCommandBuilder>(), serviceProvider.GetService<IDccCommandSender>()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -25,9 +62,14 @@ namespace RailRoadController
                 app.UseDeveloperExceptionPage();
             }
 
-            app.Run(async (context) =>
+            app.UseMvc(routes =>
             {
-                await context.Response.WriteAsync("Hello World!");
+                routes.MapRoute(
+                    name: "default_route",
+                    template: "{controller}/{action}/{id?}",
+                    defaults: new { controller = "Engine", action = "Index" }
+                );
+                routes.MapRoute(name: "api", template: "api/{controller=Admin}");
             });
         }
     }

@@ -5,13 +5,15 @@ namespace RailRoadController.BL.Locomotive
 {
     public interface ILocomotiveManager
     {
-        void ToggleDirection(string dccAddress);
-
         void SetPower(string dccAddress, int newPower);
 
         void SetInertia(string dccAddress, int newInertia);
 
         void ToggleFunction(string dccAddress, int funcNumber);
+
+        void SetDirection(string dccAddress, int direction);
+
+        Locomotive GetLocomotive(string dccAddress);
     }
 
     public class LocomotiveManager : ILocomotiveManager
@@ -23,25 +25,24 @@ namespace RailRoadController.BL.Locomotive
             _fleet = fleet;
         }
 
-        public void ToggleDirection(string dccAddress)
-        {
-            var locomotive = _fleet.SingleOrDefault(x => x.Address == dccAddress);
-
-            locomotive?.ToggleDirection();
-        }
-
         public void SetPower(string dccAddress, int newPower)
         {
             var locomotive = _fleet.SingleOrDefault(x => x.Address == dccAddress);
 
-            locomotive?.SetPower(newPower);
+            if (locomotive != null && locomotive.ProjectedPower != newPower)
+            {
+                locomotive.SetPower(newPower);
+            }
         }
 
         public void SetInertia(string dccAddress, int newInertia)
         {
             var locomotive = _fleet.SingleOrDefault(x => x.Address == dccAddress);
 
-            locomotive?.SetInertia(newInertia);
+            if (locomotive != null && locomotive.Inertia != newInertia)
+            {
+                locomotive.SetInertia(newInertia);
+            }
         }
 
         public void ToggleFunction(string dccAddress, int funcNumber)
@@ -49,6 +50,21 @@ namespace RailRoadController.BL.Locomotive
             var locomotive = _fleet.SingleOrDefault(x => x.Address == dccAddress);
 
             locomotive?.ToggleFunction(funcNumber);
+        }
+
+        public void SetDirection(string dccAddress, int newDirection)
+        {
+            var locomotive = _fleet.SingleOrDefault(x => x.Address == dccAddress);
+
+            if (locomotive != null && locomotive.Direction != newDirection)
+            {
+                locomotive.ToggleDirection();
+            }
+        }
+
+        public Locomotive GetLocomotive(string dccAddress)
+        {
+            return _fleet.Single(x => x.Address == dccAddress);
         }
     }
 }

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using FluentAssertions;
 using NUnit.Framework;
 using RailRoadController.BL.Locomotive;
@@ -16,21 +14,25 @@ namespace RailRoadControllerTest.BL.Locomotive
         [SetUp]
         public void Setup()
         {
-            _fleet = new List<RailRoadController.BL.Locomotive.Locomotive>
-            {
-                new RailRoadController.BL.Locomotive.Locomotive {Address = "01", Name = "Locomotive01", Direction = 0, ProjectedPower = 0, Inertia = 0},
-                new RailRoadController.BL.Locomotive.Locomotive {Address = "02", Name = "Locomotive02", Direction = 0, ProjectedPower = 0, Inertia = 0}
-            };
-            _sut = new LocomotiveManager(_fleet);
+            var fleet = 
+                new List<RailRoadController.BL.Locomotive.Locomotive>
+                {
+                    new RailRoadController.BL.Locomotive.Locomotive
+                        {Address = "01", Name = "Locomotive01", Direction = 0, ProjectedPower = 0, Inertia = 0},
+                    new RailRoadController.BL.Locomotive.Locomotive
+                        {Address = "02", Name = "Locomotive02", Direction = 0, ProjectedPower = 0, Inertia = 0}
+                };
+            _fleet = fleet;
+            _sut = new LocomotiveManager(fleet);
         }
 
         [Test]
-        public void ToggleDirection_should_toggle_the_direction_of_the_specified_locomotive()
+        public void SetDirection_should_toggle_the_direction_of_the_specified_locomotive()
         {
             var dccAddress = "01";
             _fleet.Single(x => x.Address == dccAddress).Direction = 0;
 
-            _sut.ToggleDirection(dccAddress);
+            _sut.SetDirection(dccAddress, 1);
 
             _fleet.Single(x => x.Address == dccAddress).Direction.Should().Be(1);
         }

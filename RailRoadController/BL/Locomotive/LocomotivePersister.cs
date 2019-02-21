@@ -20,9 +20,9 @@ namespace RailRoadController.BL.Locomotive
     {
         private readonly string _locomotiveFilePath;
 
-        public LocomotivePersister(string locomotiveFilePath)
+        public LocomotivePersister(string locomotiveFileName)
         {
-            _locomotiveFilePath = locomotiveFilePath;
+            _locomotiveFilePath = locomotiveFileName;
         }
 
         public void SaveFleet(List<Locomotive> locomotives)

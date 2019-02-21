@@ -1,4 +1,5 @@
-﻿using System.IO.Ports;
+﻿using System;
+using System.IO.Ports;
 using System.Text;
 
 namespace RailRoadController.BL.DccCommand
@@ -23,4 +24,18 @@ namespace RailRoadController.BL.DccCommand
             _serialPort.Write(Encoding.UTF8.GetBytes(command));
         }
     }
+
+    public class DccCommandSenderMock : IDccCommandSender
+    {
+        public DccCommandSenderMock()
+        {
+        }
+
+
+        public void SendCommand(string command)
+        {
+            Console.WriteLine(command);
+        }
+    }
+
 }

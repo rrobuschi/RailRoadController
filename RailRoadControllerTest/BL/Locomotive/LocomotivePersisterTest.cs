@@ -2,8 +2,10 @@
 using System.IO;
 using System.Linq;
 using FluentAssertions;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using RailRoadController.BL.Locomotive;
+using RailRoadController.Entities;
 
 namespace RailRoadControllerTest.BL.Locomotive
 {
@@ -12,7 +14,8 @@ namespace RailRoadControllerTest.BL.Locomotive
         [Test]
         public void Locomotive_informations_are_correctly_saved_to_disk_and_retrieved()
         {
-            var sut = new LocomotivePersister("TempLocoData.txt");
+            var myAppSettings = Options.Create<MyAppSettings>(new MyAppSettings {LocomotiveFile = "Locomotive.cfg"});
+            var sut = new LocomotivePersister(myAppSettings.Value.LocomotiveFile);
 
             var input = new List<RailRoadController.BL.Locomotive.Locomotive>
             {
