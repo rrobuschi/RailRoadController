@@ -6,10 +6,6 @@ node('master') {
    try {
 		 properties([buildDiscarder(logRotator(artifactNumToKeepStr: '25', numToKeepStr: env.BRANCH_NAME == 'production' ? '25' : '25'))])
 		
-		 stage('Checkout') {              
-				checkout scm
-		 }           
-
 		 notifyBuild('STARTED')           
 
 		 tokens = "${env.JOB_NAME}".tokenize('/')
