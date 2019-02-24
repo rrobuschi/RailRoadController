@@ -1,0 +1,116 @@
+// Jenkinsfile for DPS
+node('master') {
+   def version = '1.00'
+   def started = new Date()
+   def jobpath = pwd()
+   try {
+		 properties([buildDiscarder(logRotator(artifactNumToKeepStr: '25', numToKeepStr: env.BRANCH_NAME == 'production' ? '25' : '25'))])
+		
+		 stage('Checkout') {              
+				checkout scm
+		 }           
+
+		 notifyBuild('STARTED')           
+
+		 tokens = "${env.JOB_NAME}".tokenize('/')
+		 org = tokens[0]
+		 repo = tokens[1]
+
+		 configurationfor = 'debug'
+		 if (org == 'DPS'  && env.BRANCH_NAME == 'jenkins_test')
+				{
+					   configurationfor ='TEST'
+				}
+		 else if      (org == 'DPS'  && env.BRANCH_NAME == 'jenkins_integ')
+				{
+					   configurationfor ='INTEG'
+				}
+		 else if      (org == 'DPS'  && env.BRANCH_NAME == 'jenkins_prod')
+				{
+					   configurationfor ='PROD'
+				}
+
+		 def scannerHome = tool 'SonarMSBuild'
+		 stage('Environment') {    
+				withSonarQubeEnv('SonarQube') {
+					   bat "nuget restore ./src/DPS.sln -Verbosity detailed"
+					   bat "${scannerHome}\\SonarScanner.MSBuild.exe begin /k:${repo}:${org} /n:${repo}:${org} /v:${version} /d:sonar.host.url=%SONAR_HOST_URL% /d:sonar.exclusions=**/node_modules/**,**/*.js /d:sonar.cs.nunit.reportsPaths=TestResult.xml /d:sonar.cs.dotcover.reportsPaths=coverage.html"
+				}
+		 }
+
+		 stage('Build') {
+				println('MSBuild.exe /t:Rebuild src/DPS.sln /p:Configuration='+ configurationfor)
+				bat 'MSBuild.exe /t:Rebuild src/DPS.sln /p:Configuration='+ configurationfor
+		  }
+
+		 stage('Test') {
+				def testprj = "${jobpath}\\src\\DPS.Domain.InMemory.Test\\bin\\debug\\DPS.Domain.InMemory.Test.dll"
+				def testingrootpath = "${jobpath}\\tools\\NUnit.Console-3.8.0"
+				bat "Powershell.exe -executionpolicy remotesigned -File preparetestlist.ps1"
+				bat "${testingrootpath}/nunit3-console.exe ${testprj} --result=TestResult.xml;format=nunit2"
+		 }
+		
+		 stage('Coverage') {
+		def testRunner = "${jobpath}\\tools\\NUnit.Console-3.8.0\\nunit3-console.exe"
+				def testsProjects = ["${jobpath}\\src\\DPS.Domain.InMemory.Test\\bin\\debug\\DPS.Domain.InMemory.Test.dll"]
+				//bat "dotCover.exe analyse /TargetExecutable:${testRunner} /TargetArguments=${testsProjects[0]} /Output=coverage.html /ReportType=HTML"
+		 }           
+		
+		 stage('Code Analysis') {
+				withSonarQubeEnv('SonarQube') {bat "${scannerHome}\\SonarScanner.MSBuild.exe end"}
+		 }
+			
+		 stage('Declarative: Post Actions') {
+				println("Final")
+		 }
+   }
+   catch (e) {
+		 currentBuild.result = "FAILED"
+		 throw e
+   } finally {
+//             notifyBuild(currentBuild.result)
+   }     
+}
+
+def extractCommiterEmail(details) {
+   def arr = details.tokenize('\n')
+   def email = arr[2].trim()
+   return email
+}
+
+def notifyBuild(String buildStatus = 'STARTED') {
+   // build status of null means successful
+   buildStatus =  buildStatus ?: 'SUCCESSFUL'
+  
+   // Default values
+   def colorName = 'BLACK'
+   def colorCode = '#FFFFFF'
+   // Override default values based on build status
+   if (buildStatus == 'SUCCESSFUL') {
+		 colorName = 'BLUE'
+		 colorCode = '#0000FF'
+   } else if (buildStatus == 'FAILURE') {
+		 colorName = 'RED'
+		 colorCode = '#FF0000'
+   }
+
+   def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
+   def details = """<p><strong style="color: ${colorName};">${buildStatus}</strong>: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
+		 <p>Check console output at "<a href="${env.BUILD_URL}">${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>"</p>"""
+  
+   def commiterDetails = bat ( script: 'git --no-pager show -s --format=%%ae', returnStdout: true)
+   def commiter = extractCommiterEmail(commiterDetails)
+  
+   emailext (
+		 subject: subject,
+		 body: details,
+		 recipientProviders: [[$class: 'CulpritsRecipientProvider'],
+												  [$class: 'DevelopersRecipientProvider'],
+												  [$class: 'FailingTestSuspectsRecipientProvider'],
+												  [$class: 'FirstFailingBuildSuspectsRecipientProvider'],
+												  [$class: 'RequesterRecipientProvider'],
+												  [$class: 'UpstreamComitterRecipientProvider']
+												  ],
+		 to: commiter
+		 )
+}
