@@ -6,6 +6,10 @@ node('master') {
    try {
 		 properties([buildDiscarder(logRotator(artifactNumToKeepStr: '25', numToKeepStr: env.BRANCH_NAME == 'production' ? '25' : '25'))])
 		
+		stage('Checkout') {              
+                    checkout scm
+             }           
+ 
 		 tokens = "${env.JOB_NAME}".tokenize('/')
 		 org = tokens[0]
 		 repo = tokens[1]
@@ -27,31 +31,20 @@ node('master') {
 		 def scannerHome = tool 'SonarMSBuild'
 		 stage('Environment') {    
 				withSonarQubeEnv('SonarQube') {
-					   bat "nuget restore ./src/DPS.sln -Verbosity detailed"
-					   bat "${scannerHome}\\SonarScanner.MSBuild.exe begin /k:${repo}:${org} /n:${repo}:${org} /v:${version} /d:sonar.host.url=%SONAR_HOST_URL% /d:sonar.exclusions=**/node_modules/**,**/*.js /d:sonar.cs.nunit.reportsPaths=TestResult.xml /d:sonar.cs.dotcover.reportsPaths=coverage.html"
+					   bat "tools\\nuget restore .\\RailRoadController.sln -Verbosity detailed"
+					   bat "dotnet C:\\sonarqube\\sonar-scanner-msbuild-4.5.0.1761-netcoreapp2.0\\SonarScanner.MSBuild.dll begin /k:${repo}:${org} /n:${repo}:${org} /v:${version} /d:sonar.host.url=%SONAR_HOST_URL% /d:sonar.exclusions=**/node_modules/**,**/*.js /d:sonar.cs.nunit.reportsPaths=TestResult.xml /d:sonar.cs.dotcover.reportsPaths=coverage.html"
 				}
 		 }
 
 		 stage('Build') {
-				println('MSBuild.exe /t:Rebuild src/DPS.sln /p:Configuration='+ configurationfor)
-				bat 'MSBuild.exe /t:Rebuild src/DPS.sln /p:Configuration='+ configurationfor
+				println('dotnet /t:Rebuild src/DPS.sln /p:Configuration='+ configurationfor)
+				bat 'dotnet build -c '+ configurationfor + ' .\\RailRoadController.sln'
 		  }
-
-		 stage('Test') {
-				def testprj = "${jobpath}\\src\\DPS.Domain.InMemory.Test\\bin\\debug\\DPS.Domain.InMemory.Test.dll"
-				def testingrootpath = "${jobpath}\\tools\\NUnit.Console-3.8.0"
-				bat "Powershell.exe -executionpolicy remotesigned -File preparetestlist.ps1"
-				bat "${testingrootpath}/nunit3-console.exe ${testprj} --result=TestResult.xml;format=nunit2"
-		 }
-		
-		 stage('Coverage') {
-		def testRunner = "${jobpath}\\tools\\NUnit.Console-3.8.0\\nunit3-console.exe"
-				def testsProjects = ["${jobpath}\\src\\DPS.Domain.InMemory.Test\\bin\\debug\\DPS.Domain.InMemory.Test.dll"]
-				//bat "dotCover.exe analyse /TargetExecutable:${testRunner} /TargetArguments=${testsProjects[0]} /Output=coverage.html /ReportType=HTML"
-		 }           
-		
+	
 		 stage('Code Analysis') {
-				withSonarQubeEnv('SonarQube') {bat "${scannerHome}\\SonarScanner.MSBuild.exe end"}
+				withSonarQubeEnv('SonarQube') {
+					bat "dotnet C:\\sonarqube\\sonar-scanner-msbuild-4.5.0.1761-netcoreapp2.0\\SonarScanner.MSBuild.dll end"
+				}
 		 }
 			
 		 stage('Declarative: Post Actions') {
