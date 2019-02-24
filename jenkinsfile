@@ -6,8 +6,6 @@ node('master') {
    try {
 		 properties([buildDiscarder(logRotator(artifactNumToKeepStr: '25', numToKeepStr: env.BRANCH_NAME == 'production' ? '25' : '25'))])
 		
-		 notifyBuild('STARTED')           
-
 		 tokens = "${env.JOB_NAME}".tokenize('/')
 		 org = tokens[0]
 		 repo = tokens[1]
@@ -64,7 +62,6 @@ node('master') {
 		 currentBuild.result = "FAILED"
 		 throw e
    } finally {
-//             notifyBuild(currentBuild.result)
    }     
 }
 
