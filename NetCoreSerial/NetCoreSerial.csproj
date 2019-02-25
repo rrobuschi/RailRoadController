@@ -15,6 +15,7 @@
     <PackageId>NetCoreSerial</PackageId>
     <Version>1.1.0</Version>
     <PackageReleaseNotes>pdated couple of issues</PackageReleaseNotes>
+	<DebugType>Full</DebugType>
   </PropertyGroup>
 
 </Project>

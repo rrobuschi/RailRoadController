@@ -38,7 +38,7 @@ node('master') {
 
 		 stage('Build') {
 				println('dotnet /t:Rebuild src/DPS.sln /p:Configuration='+ configurationfor)
-				bat 'dotnet build -c '+ configurationfor + ' .\\RailRoadController.sln'
+				bat 'dotnet build -c '+ configurationfor + ' .\\RailRoadController.sln /p:DebugType=Full'
 		  }
 
 		   stage('Test') {
@@ -49,7 +49,7 @@ node('master') {
 		 	 stage('Coverage') {
 				def opencover = "${jobpath}\\tools\\Opencover\\Opencover.console.exe"
 				def testprj = "${jobpath}\\RailRoadControllerTest\\RailRoadControllerTest.csproj"
-				bat "\"${opencover}\" -target:\"dotnet.exe\" -targetargs:\"test\" -output:coverage.html -oldStyle"
+				bat "\"${opencover}\" -target:\"dotnet.exe\" -targetargs:\"test\" -output:coverage.html -oldstyle -filter:\"+[RailRoad*]*\""
 		 }           
 		
 	
