@@ -40,6 +40,11 @@ node('master') {
 				println('dotnet /t:Rebuild src/DPS.sln /p:Configuration='+ configurationfor)
 				bat 'dotnet build -c '+ configurationfor + ' .\\RailRoadController.sln'
 		  }
+
+		   stage('Test') {
+				def testprj = "${jobpath}\\RailRoadControllerTest\\RailRoadControllerTest.csproj"
+				bat "dotnet test \"${testprj}\" -l \"trx;LogFileName=TestResult.xml\""
+		 }
 	
 		 stage('Code Analysis') {
 				withSonarQubeEnv('SonarQube') {
