@@ -14,7 +14,27 @@ namespace RailRoadController
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            Console.WriteLine("Start EngineController program");
+            var host = new WebHostBuilder()
+                .UseKestrel()
+                .UseContentRoot(Directory.GetCurrentDirectory())
+                .UseUrls("http://*:5000")
+                .UseIISIntegration()
+                .ConfigureAppConfiguration((builderContext, config) =>
+                {
+                    IHostingEnvironment env = builderContext.HostingEnvironment;
+
+                    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                        .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
+                })
+                .ConfigureLogging(loggerFactory => loggerFactory
+                    .AddConsole()
+                    .AddDebug())
+                .UseStartup<Startup>()
+                .Build();
+
+            host.Run();
+            Console.WriteLine("EngineController program finish");
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
