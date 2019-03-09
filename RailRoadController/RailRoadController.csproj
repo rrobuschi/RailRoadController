@@ -10,7 +10,6 @@
     <Folder Include="Models\" />
     <Folder Include="Mappers\" />
     <Folder Include="Utilities\" />
-    <Folder Include="Views\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
