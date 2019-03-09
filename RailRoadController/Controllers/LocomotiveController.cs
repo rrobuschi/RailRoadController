@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using RailRoadController.BL.Locomotive;
 using RailRoadController.BL.Track;
 using RailRoadController.Entities;
@@ -47,6 +48,7 @@ namespace RailRoadController.Controllers
         [Route("[action]")]
         public void EnableTrack()
         {
+            Console.WriteLine("LocomotiveController received EnableTrack command");
             _trackManager.EnableTrack();
         }
 

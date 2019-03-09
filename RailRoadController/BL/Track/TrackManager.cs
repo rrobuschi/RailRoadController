@@ -27,6 +27,7 @@ namespace RailRoadController.BL.Track
 
         public void EnableTrack()
         {
+            Console.WriteLine("TrackManager received command EnableTrack");
             _trackOn = true;
 
             EventArgs e = new EventArgs();

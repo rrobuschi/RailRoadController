@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,6 +29,7 @@ namespace System.IO.Ports
 
         public void Open()
         {
+            Console.WriteLine("Opening serial port " + portName);
             // open serial port
             int fd = Libc.open(portName, Libc.OpenFlags.O_RDWR | Libc.OpenFlags.O_NONBLOCK);
 
@@ -81,6 +83,7 @@ namespace System.IO.Ports
 
         public void Close()
         {
+            Console.WriteLine("Closing serial port");
             if (!fd.HasValue)
             {
                 throw new Exception();
@@ -97,6 +100,8 @@ namespace System.IO.Ports
             {
                 throw new Exception();
             }
+
+            Console.WriteLine("Sending serial data " + Encoding.UTF8.GetString(buf));
 
             IntPtr ptr = Marshal.AllocHGlobal(buf.Length);
             Marshal.Copy(buf, 0, ptr, buf.Length);

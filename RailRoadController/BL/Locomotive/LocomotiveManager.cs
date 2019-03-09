@@ -19,10 +19,12 @@ namespace RailRoadController.BL.Locomotive
     public class LocomotiveManager : ILocomotiveManager
     {
         private readonly List<Locomotive> _fleet;
+        private readonly ILocomotivePersister _locomotivePersister;
 
-        public LocomotiveManager(List<Locomotive> fleet)
+        public LocomotiveManager(ILocomotivePersister locomotivePersister)
         {
-            _fleet = fleet;
+            _locomotivePersister = locomotivePersister;
+            _fleet = _locomotivePersister.LoadFleet();
         }
 
         public void SetPower(string dccAddress, int newPower)

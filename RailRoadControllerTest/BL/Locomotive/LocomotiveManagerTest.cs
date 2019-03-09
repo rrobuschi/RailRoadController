@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
+using NSubstitute;
 using NUnit.Framework;
 using RailRoadController.BL.Locomotive;
 
@@ -10,11 +11,12 @@ namespace RailRoadControllerTest.BL.Locomotive
     {
         private ILocomotiveManager _sut;
         private List<RailRoadController.BL.Locomotive.Locomotive> _fleet;
+        private ILocomotivePersister _locomotivePersister;
 
         [SetUp]
         public void Setup()
         {
-            var fleet = 
+            _fleet = 
                 new List<RailRoadController.BL.Locomotive.Locomotive>
                 {
                     new RailRoadController.BL.Locomotive.Locomotive
@@ -22,8 +24,9 @@ namespace RailRoadControllerTest.BL.Locomotive
                     new RailRoadController.BL.Locomotive.Locomotive
                         {Address = "02", Name = "Locomotive02", Direction = 0, ProjectedPower = 0, Inertia = 0}
                 };
-            _fleet = fleet;
-            _sut = new LocomotiveManager(fleet);
+            _locomotivePersister = Substitute.For<ILocomotivePersister>();
+            _locomotivePersister.LoadFleet().Returns(_fleet);
+            _sut = new LocomotiveManager(_locomotivePersister);
         }
 
         [Test]

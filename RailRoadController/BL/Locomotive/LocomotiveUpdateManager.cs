@@ -16,14 +16,17 @@ namespace RailRoadController.BL.Locomotive
         private readonly ConcurrentQueue<string> _commandQueue;
         private readonly IDccCommandBuilder _dccCommandBuilder;
         private readonly IDccCommandSender _dccCommandSender;
+        private ILocomotivePersister _locomotivePersister;
         private readonly Timer _timer;
         private ITrackManager _trackManager;
 
-        public LocomotiveUpdateManager(List<Locomotive> fleet, IDccCommandBuilder dccCommandBuilder, IDccCommandSender dccCommandSender, ITrackManager trackManager)
+        public LocomotiveUpdateManager(ILocomotivePersister locomotivePersister, IDccCommandBuilder dccCommandBuilder, IDccCommandSender dccCommandSender, ITrackManager trackManager)
         {
             _dccCommandBuilder = dccCommandBuilder;
             _dccCommandSender = dccCommandSender;
             _trackManager = trackManager;
+            _locomotivePersister = locomotivePersister;
+            var fleet = _locomotivePersister.LoadFleet();
             _commandQueue = new ConcurrentQueue<string>();
             _timer = new Timer(100);
             _timer.Elapsed += TimerElapsed;
@@ -41,9 +44,11 @@ namespace RailRoadController.BL.Locomotive
 
         private void TrackStatusChanged(object sender, EventArgs e)
         {
+            Console.WriteLine("LocomotiveUpdateController event handler TrackStatusChanged");
             var trackManager = (TrackManager) sender;
             var dccCommand = _dccCommandBuilder.BuildCommand(trackManager.GetTrackStatus());
 
+            Console.WriteLine("Prepared DCC command " + dccCommand);
             _commandQueue.Enqueue(dccCommand);
         }
 
@@ -52,6 +57,7 @@ namespace RailRoadController.BL.Locomotive
             _timer.Stop();
             while (_commandQueue.TryDequeue(out var dccCommand))
             {
+                Console.WriteLine("Sending command " + dccCommand);
                 _dccCommandSender.SendCommand(dccCommand);
             }
             _timer.Start();

@@ -21,7 +21,10 @@ namespace RailRoadController.BL.DccCommand
 
         public void SendCommand(string command)
         {
+            _serialPort.Open();
+            Console.WriteLine("DccCommandSender is sending command " + command);
             _serialPort.Write(Encoding.UTF8.GetBytes(command));
+            _serialPort.Close();
         }
     }
 

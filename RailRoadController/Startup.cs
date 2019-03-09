@@ -35,13 +35,11 @@ namespace RailRoadController
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            var locomotivePersister = new LocomotivePersister(Configuration.GetSection("AppSettings")["LocomotiveFile"]);
-            var fleet = locomotivePersister.LoadFleet();
-
+            services.AddTransient<ILocomotivePersister>(x =>
+                new LocomotivePersister(Configuration.GetSection("AppSettings")["LocomotiveFile"]));
             services.AddSingleton<ITrackManager, TrackManager>();
-            services.AddSingleton<ILocomotiveManager>(x => new LocomotiveManager(fleet));
+            services.AddSingleton<ILocomotiveManager, LocomotiveManager>();
             services.AddTransient<ILocomotive, Locomotive>();
-            services.AddTransient<ILocomotivePersister, LocomotivePersister>();
             services.AddTransient<IDccCommandBuilder, DccCommandBuilder>();
             if (CurrentEnvironment.IsDevelopment())
                 services.AddTransient<IDccCommandSender, DccCommandSenderMock>();
@@ -52,8 +50,7 @@ namespace RailRoadController
 
             var serviceProvider = services.BuildServiceProvider();
 
-            services.AddSingleton<ILocomotiveUpdateManager>(x => new LocomotiveUpdateManager(fleet,
-                serviceProvider.GetService<IDccCommandBuilder>(), serviceProvider.GetService<IDccCommandSender>(), serviceProvider.GetService<ITrackManager>()));
+            services.AddSingleton<ILocomotiveUpdateManager, LocomotiveUpdateManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

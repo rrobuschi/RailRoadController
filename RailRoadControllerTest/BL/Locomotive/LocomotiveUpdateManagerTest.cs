@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using NUnit.Framework;
 using FluentAssertions;
@@ -17,6 +18,7 @@ namespace RailRoadControllerTest.BL.Locomotive
         private IDccCommandBuilder _dccCommandBuilder;
         private IDccCommandSender _dccCommandSender;
         private ITrackManager _trackManager;
+        private ILocomotivePersister _locomotivePersister;
 
         [SetUp]
         public void Setup()
@@ -30,7 +32,10 @@ namespace RailRoadControllerTest.BL.Locomotive
             };
             _dccCommandBuilder = Substitute.For<IDccCommandBuilder>();
             _dccCommandSender = Substitute.For<IDccCommandSender>();
-            _sut = new LocomotiveUpdateManager(_fleet, _dccCommandBuilder, _dccCommandSender, _trackManager);
+            _trackManager = Substitute.For<ITrackManager>();
+            _locomotivePersister = Substitute.For<ILocomotivePersister>();
+            _locomotivePersister.LoadFleet().Returns(_fleet);
+            _sut = new LocomotiveUpdateManager(_locomotivePersister, _dccCommandBuilder, _dccCommandSender, _trackManager);
         }
 
         [Test]
