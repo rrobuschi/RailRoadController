@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RailRoadController.BL.DccCommand;
 using RailRoadController.BL.Locomotive;
+using RailRoadController.BL.Track;
 using RailRoadController.Entities;
 
 namespace RailRoadController
@@ -37,6 +38,7 @@ namespace RailRoadController
             var locomotivePersister = new LocomotivePersister(Configuration.GetSection("AppSettings")["LocomotiveFile"]);
             var fleet = locomotivePersister.LoadFleet();
 
+            services.AddSingleton<ITrackManager, TrackManager>();
             services.AddSingleton<ILocomotiveManager>(x => new LocomotiveManager(fleet));
             services.AddTransient<ILocomotive, Locomotive>();
             services.AddTransient<ILocomotivePersister, LocomotivePersister>();
@@ -51,7 +53,7 @@ namespace RailRoadController
             var serviceProvider = services.BuildServiceProvider();
 
             services.AddSingleton<ILocomotiveUpdateManager>(x => new LocomotiveUpdateManager(fleet,
-                serviceProvider.GetService<IDccCommandBuilder>(), serviceProvider.GetService<IDccCommandSender>()));
+                serviceProvider.GetService<IDccCommandBuilder>(), serviceProvider.GetService<IDccCommandSender>(), serviceProvider.GetService<ITrackManager>()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

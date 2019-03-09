@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RailRoadController.BL.Locomotive;
+using RailRoadController.BL.Track;
 using RailRoadController.Entities;
 
 namespace RailRoadController.Controllers
@@ -10,11 +11,13 @@ namespace RailRoadController.Controllers
     {
         private readonly ILocomotiveManager _locomotiveManager;
         private ILocomotiveUpdateManager _locomotiveUpdateManager;
+        private ITrackManager _trackManager;
 
-        public LocomotiveController(ILocomotiveManager locomotiveManager, ILocomotiveUpdateManager locomotiveUpdateManager)
+        public LocomotiveController(ILocomotiveManager locomotiveManager, ILocomotiveUpdateManager locomotiveUpdateManager, ITrackManager trackManager)
         {
             _locomotiveManager = locomotiveManager;
             _locomotiveUpdateManager = locomotiveUpdateManager;
+            _trackManager = trackManager;
         }
 
         [Route("[action]")]
@@ -39,6 +42,18 @@ namespace RailRoadController.Controllers
             var output = locomotive.MapToLocomotiveStatus();
 
             return output;
+        }
+
+        [Route("[action]")]
+        public void EnableTrack()
+        {
+            _trackManager.EnableTrack();
+        }
+
+        [Route("[action]")]
+        public void DisableTrack()
+        {
+            _trackManager.DisableTrack();
         }
     }
 

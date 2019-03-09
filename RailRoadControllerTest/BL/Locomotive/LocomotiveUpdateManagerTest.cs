@@ -5,6 +5,7 @@ using FluentAssertions;
 using NSubstitute;
 using RailRoadController.BL.DccCommand;
 using RailRoadController.BL.Locomotive;
+using RailRoadController.BL.Track;
 using RailRoadController.Entities;
 
 namespace RailRoadControllerTest.BL.Locomotive
@@ -15,6 +16,7 @@ namespace RailRoadControllerTest.BL.Locomotive
         private List<RailRoadController.BL.Locomotive.Locomotive> _fleet;
         private IDccCommandBuilder _dccCommandBuilder;
         private IDccCommandSender _dccCommandSender;
+        private ITrackManager _trackManager;
 
         [SetUp]
         public void Setup()
@@ -28,7 +30,7 @@ namespace RailRoadControllerTest.BL.Locomotive
             };
             _dccCommandBuilder = Substitute.For<IDccCommandBuilder>();
             _dccCommandSender = Substitute.For<IDccCommandSender>();
-            _sut = new LocomotiveUpdateManager(_fleet, _dccCommandBuilder, _dccCommandSender);
+            _sut = new LocomotiveUpdateManager(_fleet, _dccCommandBuilder, _dccCommandSender, _trackManager);
         }
 
         [Test]

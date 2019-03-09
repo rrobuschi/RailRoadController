@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Timers;
 using RailRoadController.BL.DccCommand;
+using RailRoadController.BL.Track;
 
 namespace RailRoadController.BL.Locomotive
 {
@@ -16,11 +17,13 @@ namespace RailRoadController.BL.Locomotive
         private readonly IDccCommandBuilder _dccCommandBuilder;
         private readonly IDccCommandSender _dccCommandSender;
         private readonly Timer _timer;
+        private ITrackManager _trackManager;
 
-        public LocomotiveUpdateManager(List<Locomotive> fleet, IDccCommandBuilder dccCommandBuilder, IDccCommandSender dccCommandSender)
+        public LocomotiveUpdateManager(List<Locomotive> fleet, IDccCommandBuilder dccCommandBuilder, IDccCommandSender dccCommandSender, ITrackManager trackManager)
         {
             _dccCommandBuilder = dccCommandBuilder;
             _dccCommandSender = dccCommandSender;
+            _trackManager = trackManager;
             _commandQueue = new ConcurrentQueue<string>();
             _timer = new Timer(100);
             _timer.Elapsed += TimerElapsed;
@@ -31,7 +34,17 @@ namespace RailRoadController.BL.Locomotive
                 locomotive.MovementChanged += LocomotiveMovementChanged;
             }
 
+            _trackManager.TrackStatusChanged += TrackStatusChanged;
+
             _timer.Start();
+        }
+
+        private void TrackStatusChanged(object sender, EventArgs e)
+        {
+            var trackManager = (TrackManager) sender;
+            var dccCommand = _dccCommandBuilder.BuildCommand(trackManager.GetTrackStatus());
+
+            _commandQueue.Enqueue(dccCommand);
         }
 
         private void TimerElapsed(object sender, ElapsedEventArgs e)
