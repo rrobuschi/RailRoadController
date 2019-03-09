@@ -11,13 +11,11 @@ namespace RailRoadController.Controllers
     public class LocomotiveController : ControllerBase
     {
         private readonly ILocomotiveManager _locomotiveManager;
-        private ILocomotiveUpdateManager _locomotiveUpdateManager;
-        private ITrackManager _trackManager;
+        private readonly ITrackManager _trackManager;
 
-        public LocomotiveController(ILocomotiveManager locomotiveManager, ILocomotiveUpdateManager locomotiveUpdateManager, ITrackManager trackManager)
+        public LocomotiveController(ILocomotiveManager locomotiveManager, ITrackManager trackManager)
         {
             _locomotiveManager = locomotiveManager;
-            _locomotiveUpdateManager = locomotiveUpdateManager;
             _trackManager = trackManager;
         }
 

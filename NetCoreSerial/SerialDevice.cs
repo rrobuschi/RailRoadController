@@ -13,7 +13,7 @@ namespace System.IO.Ports
         private readonly CancellationTokenSource cts = new CancellationTokenSource();
         private CancellationToken CancellationToken => cts.Token;
 
-        private int? fd;
+        private int? _fd;
         private readonly IntPtr readingBuffer = Marshal.AllocHGlobal(READING_BUFFER_SIZE);
 
         protected readonly string portName;
@@ -35,7 +35,7 @@ namespace System.IO.Ports
 
             if (fd == -1)
             {
-                throw new Exception($"failed to open port ({portName})");
+                throw new ApplicationException($"failed to open port ({portName})");
             }
 
             // set baud rate
@@ -46,12 +46,12 @@ namespace System.IO.Ports
             Libc.tcsetattr(fd, 0, termiosData);
             // start reading
             Task.Run((Action)StartReading, CancellationToken);
-            this.fd = fd;
+            this._fd = fd;
         }
 
         private void StartReading()
         {
-            if (!fd.HasValue)
+            if (!_fd.HasValue)
             {
                 throw new Exception();
             }
@@ -60,7 +60,7 @@ namespace System.IO.Ports
             {
                 CancellationToken.ThrowIfCancellationRequested();
 
-                int res = Libc.read(fd.Value, readingBuffer, READING_BUFFER_SIZE);
+                int res = Libc.read(_fd.Value, readingBuffer, READING_BUFFER_SIZE);
 
                 if (res != -1)
                 {
@@ -79,33 +79,33 @@ namespace System.IO.Ports
             DataReceived?.Invoke(this, data);
         }
 
-        public bool IsOpened => fd.HasValue;
+        public bool IsOpened => _fd.HasValue;
 
         public void Close()
         {
             Console.WriteLine("Closing serial port");
-            if (!fd.HasValue)
+            if (!_fd.HasValue)
             {
-                throw new Exception();
+                throw new ApplicationException();
             }
 
             cts.Cancel();
-            Libc.close(fd.Value);
+            Libc.close(_fd.Value);
             Marshal.FreeHGlobal(readingBuffer);
         }
 
         public void Write(byte[] buf)
         {
-            if (!fd.HasValue)
+            if (!_fd.HasValue)
             {
-                throw new Exception();
+                throw new ApplicationException();
             }
 
             Console.WriteLine("Sending serial data " + Encoding.UTF8.GetString(buf));
 
             IntPtr ptr = Marshal.AllocHGlobal(buf.Length);
             Marshal.Copy(buf, 0, ptr, buf.Length);
-            Libc.write(fd.Value, ptr, buf.Length);
+            Libc.write(_fd.Value, ptr, buf.Length);
             Marshal.FreeHGlobal(ptr);
         }
 
@@ -128,7 +128,6 @@ namespace System.IO.Ports
                         || dev.StartsWith("/dev/serial"))
                     {
                         serial_ports.Add(dev);
-                        //Console.WriteLine("Serial list: {0}", dev);
                     }
                 }
                 //newer Pi with bluetooth map serial

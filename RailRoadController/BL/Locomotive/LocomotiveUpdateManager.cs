@@ -16,9 +16,9 @@ namespace RailRoadController.BL.Locomotive
         private readonly ConcurrentQueue<string> _commandQueue;
         private readonly IDccCommandBuilder _dccCommandBuilder;
         private readonly IDccCommandSender _dccCommandSender;
-        private ILocomotivePersister _locomotivePersister;
+        private readonly ILocomotivePersister _locomotivePersister;
         private readonly Timer _timer;
-        private ITrackManager _trackManager;
+        private readonly ITrackManager _trackManager;
 
         public LocomotiveUpdateManager(ILocomotivePersister locomotivePersister, IDccCommandBuilder dccCommandBuilder, IDccCommandSender dccCommandSender, ITrackManager trackManager)
         {

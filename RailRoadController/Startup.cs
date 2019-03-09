@@ -48,8 +48,6 @@ namespace RailRoadController
 
             services.AddSingleton<ISerialDevice>(x => new SerialDevice("/dev/ttyACM0", BaudRate.B115200));
 
-            var serviceProvider = services.BuildServiceProvider();
-
             services.AddSingleton<ILocomotiveUpdateManager, LocomotiveUpdateManager>();
         }
 

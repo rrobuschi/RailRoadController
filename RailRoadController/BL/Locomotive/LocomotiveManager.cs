@@ -54,11 +54,11 @@ namespace RailRoadController.BL.Locomotive
             locomotive?.ToggleFunction(funcNumber);
         }
 
-        public void SetDirection(string dccAddress, int newDirection)
+        public void SetDirection(string dccAddress, int direction)
         {
             var locomotive = _fleet.SingleOrDefault(x => x.Address == dccAddress);
 
-            if (locomotive != null && locomotive.Direction != newDirection)
+            if (locomotive != null && locomotive.Direction != direction)
             {
                 locomotive.ToggleDirection();
             }

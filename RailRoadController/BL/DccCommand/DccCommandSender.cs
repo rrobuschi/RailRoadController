@@ -12,7 +12,7 @@ namespace RailRoadController.BL.DccCommand
 
     public class DccCommandSender : IDccCommandSender
     {
-        private ISerialDevice _serialPort;
+        private readonly ISerialDevice _serialPort;
 
         public DccCommandSender(ISerialDevice serialPort)
         {
