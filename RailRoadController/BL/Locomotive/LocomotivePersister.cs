@@ -20,9 +20,12 @@ namespace RailRoadController.BL.Locomotive
     {
         private readonly string _locomotiveFilePath;
 
+        private List<Locomotive> _fleet;
+
         public LocomotivePersister(string locomotiveFileName)
         {
             _locomotiveFilePath = locomotiveFileName;
+            _fleet = null;
         }
 
         public void SaveFleet(List<Locomotive> locomotives)
@@ -36,13 +39,15 @@ namespace RailRoadController.BL.Locomotive
 
         public List<Locomotive> LoadFleet()
         {
+            if (_fleet != null) return _fleet;
+
             var fleetAsString = File.ReadAllText(_locomotiveFilePath);
 
             var fleetConfiguration = JsonConvert.DeserializeObject<List<LocomotiveConfiguration>>(fleetAsString);
 
-            var output = FromConfig(fleetConfiguration);
+            _fleet = FromConfig(fleetConfiguration);
 
-            return output;
+            return _fleet;
         }
 
         private List<LocomotiveConfiguration> ToConfig(IEnumerable<Locomotive> locomotives)

@@ -35,7 +35,7 @@ namespace RailRoadController
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.AddTransient<ILocomotivePersister>(x =>
+            services.AddSingleton<ILocomotivePersister>(x =>
                 new LocomotivePersister(Configuration.GetSection("AppSettings")["LocomotiveFile"]));
             services.AddSingleton<ITrackManager, TrackManager>();
             services.AddSingleton<ILocomotiveManager, LocomotiveManager>();

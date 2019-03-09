@@ -65,10 +65,11 @@ namespace RailRoadController.BL.Locomotive
 
         private void LocomotiveMovementChanged(object sender, EventArgs e)
         {
+            Console.WriteLine("LocomotiveUpdateController event handler LocomotiveMovementChanged");
             var locomotive = (Locomotive)sender;
 
             var dccCommand = _dccCommandBuilder.BuildCommand(locomotive.Address, locomotive.ProjectedPower.ToString(), locomotive.Direction.ToString());
-
+            Console.WriteLine("Prepared DCC command " + dccCommand);
             _commandQueue.Enqueue(dccCommand);
         }
 

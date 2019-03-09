@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO.Ports;
 using System.Text;
+using System.Threading;
 
 namespace RailRoadController.BL.DccCommand
 {
@@ -21,10 +22,13 @@ namespace RailRoadController.BL.DccCommand
 
         public void SendCommand(string command)
         {
-            _serialPort.Open();
+            if (!_serialPort.IsOpened)
+            {
+                _serialPort.Open();
+                Thread.Sleep(1000);
+            }
             Console.WriteLine("DccCommandSender is sending command " + command);
             _serialPort.Write(Encoding.UTF8.GetBytes(command));
-            _serialPort.Close();
         }
     }
 

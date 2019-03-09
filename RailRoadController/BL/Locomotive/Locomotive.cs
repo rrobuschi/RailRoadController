@@ -44,6 +44,7 @@ namespace RailRoadController.BL.Locomotive
 
         protected virtual void RaiseMovementChanged()
         {
+            Console.WriteLine("Locomotive.RaiseMovementChanged " + Address);
             EventArgs e = new EventArgs();
             MovementChanged?.Invoke(this, e);
         }

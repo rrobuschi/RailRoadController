@@ -24,6 +24,7 @@ namespace RailRoadController.Controllers
         [Route("[action]")]
         public void SetLocomotiveMovement([FromBody] MovementCommand command)
         {
+            Console.WriteLine("SetLocomotiveMovement received");
             _locomotiveManager.SetInertia(command.DccAddress, command.Inertia);
             _locomotiveManager.SetPower(command.DccAddress, command.Power);
             _locomotiveManager.SetDirection(command.DccAddress, command.Direction);
