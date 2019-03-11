@@ -68,6 +68,8 @@ namespace RailRoadController
                 );
                 routes.MapRoute(name: "api", template: "api/{controller=Admin}");
             });
+
+            app.UseStaticFiles();
         }
     }
 }

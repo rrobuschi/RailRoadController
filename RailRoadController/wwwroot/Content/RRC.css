@@ -1,0 +1,20 @@
+﻿body {
+}
+
+.Controls {
+    background-color: green;
+    width: 19vw;
+    float: left;
+}
+
+.Layout {
+    background-color: yellow;
+    width: 60vw;
+    float: left;
+}
+
+.Functions {
+    background-color: red;
+    width: 19vw;
+    float: left;
+}
