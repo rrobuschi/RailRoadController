@@ -7,11 +7,17 @@
     <meta name="viewport" content="width=device-width" />
     <title>RailRoadController - Driver</title>
     <link rel="stylesheet" type="text/css" href="~/Content/RRC.css">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
 </head>
 <body>
-<div class="Controls">
-    controls
-</div>
+    <div class="Controls">
+        <div style="height: 75px;padding: 25px 10px 25px 10px"><img src="/Content/images/Lights_off.png" /></div>
+        <div style="height: 75px;padding: 25px 10px 25px 10px"><img src="/Content/images/trai_dir_left.png" /></div>
+        <div style="height: 75px;padding: 25px 10px 25px 10px"><img src="/Content/images/stop_sign.png" /></div>
+        
+        <input class='range vertical-heighest-first' type='range' min='0' max='126' step='2' value='0'
+               style="position: absolute; top: 200px; left: 50px;" id="sliderPower" onchange="SetSpeedTrain();">
+    </div>
 <div class="Layout">
     Layout
 </div>
